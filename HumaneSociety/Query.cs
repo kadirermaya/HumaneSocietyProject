@@ -166,8 +166,96 @@ namespace HumaneSociety
         // TODO: Allow any of the CRUD operations to occur here
         internal static void RunEmployeeQueries(Employee employee, string crudOperation)
         {
+           
             throw new NotImplementedException();
         }
+
+
+        internal static void AddNewEmployee(string firstName, string lastName, string username, string password, int employeeNumber, string email)
+        {
+            Employee newEmployee = new Employee();
+
+            newEmployee.FirstName = firstName;
+            newEmployee.LastName = lastName;
+            newEmployee.UserName = username;
+            newEmployee.Password = password;
+            newEmployee.EmployeeNumber = employeeNumber;
+            newEmployee.Email = email;
+
+            
+            db.Employees.InsertOnSubmit(newEmployee);
+
+            db.SubmitChanges();
+        }
+
+
+        internal static void UpdateEmployee(Employee employeeWithUpdates)
+        {
+            // find corresponding Client from Db
+            Employee employeeFromDb = null;
+
+            try
+            {
+                employeeFromDb = db.Employees.Where(e => e.EmployeeId == employeeWithUpdates.EmployeeId).Single();
+            }
+            catch (InvalidOperationException e)
+            {
+                Console.WriteLine("No employees have a EmployeeId that matches the Employee passed in.");
+                Console.WriteLine("No update have been made.");
+                return;
+            }
+
+            // update clientFromDb information with the values on clientWithUpdates (aside from address)
+            employeeFromDb.FirstName = employeeWithUpdates.FirstName;
+            employeeFromDb.LastName = employeeWithUpdates.LastName;
+            employeeFromDb.UserName = employeeWithUpdates.UserName;
+            employeeFromDb.Password = employeeWithUpdates.Password;
+            employeeFromDb.EmployeeNumber = employeeWithUpdates.EmployeeNumber;
+            employeeFromDb.Email = employeeWithUpdates.Email;
+                   
+
+            // submit changes
+            db.SubmitChanges();
+        }
+
+        internal static Employee GetEmployee(string userName, string password)
+        {
+            Employee employee;
+            try
+            {
+            employee = db.Employees.Where(e => e.UserName == userName && e.Password == password).Single();
+
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("No employees found.");
+                throw;
+            }
+
+            return employee;
+        }
+
+        
+
+        internal static void RemoveEmployee(Employee employee)
+        {
+            try
+            {
+                employee = db.Employees.Where(e => e.EmployeeId == employee.EmployeeId).Single();
+            }
+            catch (InvalidOperationException e)
+            {
+                Console.WriteLine("No employees have a EmployeeId that matches the Employee passed in.");
+                Console.WriteLine("No update have been made.");
+                return;
+            }
+
+            db.Employees.DeleteOnSubmit(employee);
+            db.SubmitChanges();
+        }
+
+
+
 
         // TODO: Animal CRUD Operations
         internal static void AddAnimal(Animal animal)
