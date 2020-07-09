@@ -287,7 +287,7 @@
                 switch (update.Key)
                 {
                     case 1:
-                        query.CategoryId = Int32.Parse(update.Value);
+                        query.CategoryId = GetCategoryId(update.Value);
                         break;
                     case 2:
                         query.Name = update.Value;
@@ -336,29 +336,73 @@
         // TODO: Animal Multi-Trait Search
         internal static IQueryable<Animal> SearchForAnimalsByMultipleTraits(Dictionary<int, string> updates) // parameter(s)?
         {
-            throw new NotImplementedException();
+            IQueryable<Animal> searchedAnimals = db.Animals;
+            
+            foreach (var update in updates)
+            {
+                    switch (update.Key)
+                {
+                    case 1:
+                        var categoryId = GetCategoryId(update.Value);
+                        searchedAnimals = searchedAnimals.Where(a => a.CategoryId == categoryId);
+                        break;
+                    case 2:
+                        searchedAnimals = searchedAnimals.Where(a => a.Name == update.Value);
+                        break;
+                    case 3:
+                        searchedAnimals = searchedAnimals.Where(a => a.Age == Int32.Parse(update.Value));
+                        break;
+                    case 4:
+                        searchedAnimals = searchedAnimals.Where(a => a.Demeanor == update.Value);
+                        break;
+                    case 5:
+                        searchedAnimals = searchedAnimals.Where(a => a.KidFriendly == bool.Parse(update.Value));
+                        break;
+                    case 6:
+                        searchedAnimals = searchedAnimals.Where(a => a.PetFriendly == bool.Parse(update.Value));
+                        break;
+                    case 7:
+                        searchedAnimals = searchedAnimals.Where(a => a.Weight == Int32.Parse(update.Value));
+                        break;
+                    case 8:
+                        searchedAnimals = searchedAnimals.Where(a => a.AnimalId == Int32.Parse(update.Value));
+                        break;
+                    }
+            }
+            return searchedAnimals;
         }
 
         // TODO: Misc Animal Things
         internal static int GetCategoryId(string categoryName)
         {
-            throw new NotImplementedException();
+            var categoryID = db.Categories.Where(c => c.Name == categoryName).FirstOrDefault();
+            return categoryID.CategoryId;
         }
 
-        internal static Room GetRoom(int animalId)
+        internal static Room GetRoom(int animalID)
         {
-            throw new NotImplementedException();
+            var roomId = db.Rooms.Where(r => r.AnimalId == animalID).FirstOrDefault();
+            return roomId;
         }
 
         internal static int GetDietPlanId(string dietPlanName)
         {
-            throw new NotImplementedException();
+            var dietPlanId = db.DietPlans.Where(d => d.Name == dietPlanName).FirstOrDefault();
+            return dietPlanId.DietPlanId;
         }
 
         // TODO: Adoption CRUD Operations
         internal static void Adopt(Animal animal, Client client)
         {
-            throw new NotImplementedException();
+            var adoption = new Adoption();
+            adoption.AnimalId = animal.AnimalId;
+            adoption.ClientId = client.ClientId;
+            adoption.ApprovalStatus = "Processing";
+            adoption.AdoptionFee = 75;
+            adoption.PaymentCollected = true;
+            
+            db.Adoptions.InsertOnSubmit(adoption);
+            db.SubmitChanges();
         }
 
         internal static IQueryable<Adoption> GetPendingAdoptions()
