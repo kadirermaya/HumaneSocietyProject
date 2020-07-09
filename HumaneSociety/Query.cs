@@ -430,13 +430,16 @@
 
         internal static void RemoveAdoption(int animalId, int clientId)
         {
-            throw new NotImplementedException();
+            var  foundAdoptions = db.Adoptions.Where(a => a.AnimalId == animalId && a.ClientId == clientId).Single();
+            db.Adoptions.DeleteOnSubmit(foundAdoptions);
+            db.SubmitChanges();
         }
 
         // TODO: Shots Stuff
         internal static IQueryable<AnimalShot> GetShots(Animal animal)
         {
-            throw new NotImplementedException();
+            IQueryable<AnimalShot> animalShot = db.AnimalShots.Where(a => a.AnimalId == animal.AnimalId);
+            return animalShot;
         }
 
         internal static void UpdateShot(string shotName, Animal animal)
