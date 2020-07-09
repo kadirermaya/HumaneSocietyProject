@@ -444,7 +444,13 @@
 
         internal static void UpdateShot(string shotName, Animal animal)
         {
-            throw new NotImplementedException();
+            var foundShot = db.Shots.Where(s => s.Name == shotName).FirstOrDefault();
+            var newAnimalShot = new AnimalShot();
+
+            newAnimalShot.AnimalId = animal.AnimalId;
+            newAnimalShot.ShotId = foundShot.ShotId;
+            newAnimalShot.DateReceived = DateTime.Today;
+
         }
     }
 }
