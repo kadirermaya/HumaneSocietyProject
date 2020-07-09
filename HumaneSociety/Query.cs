@@ -397,22 +397,35 @@
             var adoption = new Adoption();
             adoption.AnimalId = animal.AnimalId;
             adoption.ClientId = client.ClientId;
-            adoption.ApprovalStatus = "Processing";
+            adoption.ApprovalStatus = "Pending";
             adoption.AdoptionFee = 75;
             adoption.PaymentCollected = true;
-            
             db.Adoptions.InsertOnSubmit(adoption);
             db.SubmitChanges();
         }
 
         internal static IQueryable<Adoption> GetPendingAdoptions()
         {
-            throw new NotImplementedException();
+            IQueryable<Adoption> adoption = db.Adoptions.Where(a => a.ApprovalStatus == "Pending");
+            return adoption;
         }
 
         internal static void UpdateAdoption(bool isAdopted, Adoption adoption)
         {
-            throw new NotImplementedException();
+            var foundAdoptions = db.Adoptions.Where(a => a.AnimalId == adoption.AnimalId && a.ClientId == adoption.ClientId).Single();
+            var updateAnimal = db.Animals.Where(x => x.AnimalId == adoption.AnimalId).Single();
+            var updateRoom = db.Rooms.Where(r => r.AnimalId == adoption.AnimalId).Single();
+            if (isAdopted)
+            {
+                foundAdoptions.ApprovalStatus = "Accepted";
+                updateAnimal.AdoptionStatus = "Adopted";
+                updateRoom.AnimalId = null;
+            }
+            else
+            {
+                foundAdoptions.ApprovalStatus = "Denied";
+            }
+            db.SubmitChanges();
         }
 
         internal static void RemoveAdoption(int animalId, int clientId)
