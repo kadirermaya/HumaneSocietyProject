@@ -235,10 +235,11 @@ namespace HumaneSociety
             catch (Exception)
             {
                 Console.WriteLine("No employees found.");
-                throw;
+                return null;
             }
 
             return employee;
+
         }
 
         internal static void RemoveEmployee(Employee employee)
@@ -276,7 +277,7 @@ namespace HumaneSociety
             catch (Exception)
             {
                 Console.WriteLine("No animal found.");
-                throw;
+                return null;
             }
         }
 
@@ -311,15 +312,12 @@ namespace HumaneSociety
                     case 7:
                         query.Weight = Int32.Parse(update.Value);
                         break;
-                   
-
                 }
             }
             db.SubmitChanges();
         }
 
-        /*1. Category", "2. Name", "3. Age", "4. Demeanor", "5. Kid friendly", 
-         * "6. Pet friendly", "7. Weight", "8. Finished*/
+        
         internal static void RemoveAnimal(Animal animal)
         {
             try
@@ -379,19 +377,49 @@ namespace HumaneSociety
         // TODO: Misc Animal Things
         internal static int GetCategoryId(string categoryName)
         {
-            var categoryID = db.Categories.Where(c => c.Name == categoryName).FirstOrDefault();
+            Category categoryID;
+            try
+            {
+            categoryID = db.Categories.Where(c => c.Name == categoryName).FirstOrDefault();
+
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Category ID not found!");
+                throw;
+            }
             return categoryID.CategoryId;
         }
 
         internal static Room GetRoom(int animalID)
         {
-            var roomId = db.Rooms.Where(r => r.AnimalId == animalID).FirstOrDefault();
+            Room roomId; 
+            try
+            {
+                roomId = db.Rooms.Where(r => r.AnimalId == animalID).FirstOrDefault();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Room not found!");
+                return null;
+            }
+            
             return roomId;
         }
 
         internal static int GetDietPlanId(string dietPlanName)
         {
-            var dietPlanId = db.DietPlans.Where(d => d.Name == dietPlanName).FirstOrDefault();
+            DietPlan dietPlanId; 
+            try
+            {
+                dietPlanId = db.DietPlans.Where(d => d.Name == dietPlanName).FirstOrDefault();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Diet Plan not found!");
+                throw;
+            }
+            
             return dietPlanId.DietPlanId;
         }
 
@@ -410,7 +438,16 @@ namespace HumaneSociety
 
         internal static IQueryable<Adoption> GetPendingAdoptions()
         {
-            IQueryable<Adoption> adoption = db.Adoptions.Where(a => a.ApprovalStatus == "Pending");
+            IQueryable<Adoption> adoption; 
+            try
+            {
+                adoption = db.Adoptions.Where(a => a.ApprovalStatus == "Pending");
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("There are no pending adoptions!");
+                return null;
+            }
             return adoption;
         }
 
@@ -442,85 +479,101 @@ namespace HumaneSociety
         // TODO: Shots Stuff
         internal static IQueryable<AnimalShot> GetShots(Animal animal)
         {
-            IQueryable<AnimalShot> animalShot = db.AnimalShots.Where(a => a.AnimalId == animal.AnimalId);
+            IQueryable<AnimalShot> animalShot; 
+            try
+            {
+                animalShot = db.AnimalShots.Where(a => a.AnimalId == animal.AnimalId);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Shot not found!");
+                return null;
+            }
             return animalShot;
         }
 
         internal static void UpdateShot(string shotName, Animal animal)
         {
-            var foundShot = db.Shots.Where(s => s.Name == shotName).FirstOrDefault();
-            var newAnimalShot = new AnimalShot();
-
+            Shot foundShot;
+            AnimalShot newAnimalShot;
+            try
+            {
+                foundShot = db.Shots.Where(s => s.Name == shotName).FirstOrDefault();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Shot not found!");
+                return;
+            }
+            newAnimalShot = new AnimalShot();
             newAnimalShot.AnimalId = animal.AnimalId;
             newAnimalShot.ShotId = foundShot.ShotId;
             newAnimalShot.DateReceived = DateTime.Today;
 
         }
 
-        internal static void AnimalsFromCSV() //"C:/users/file.csv
+        internal static void AnimalsFromCSV(string path)
         {
-            string path = "D:\\Source\\repos\\HumaneSociety\\animals.csv";
+            string[] csv;
+            try
+            {
+            csv = File.ReadAllLines(path);
 
-            Animal newAnimal = new Animal();
-            string[] csv = File.ReadAllLines(path);//"Fido,13,Male,Dog Food,Friendly,True"
-
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Invalid path chosen!");
+                return;
+            }
             foreach (string item in csv)
             {
+                Animal newAnimal = new Animal();
                 string[] data = item.Split(',');
 
                 newAnimal.Name = data[0];
-                newAnimal.Weight = Int32.Parse(data[1]);
-                newAnimal.Age = Int32.Parse(data[2]);
+                newAnimal.Weight = StringToInt(data[1]);
+                newAnimal.Age = StringToInt(data[2]);
                 newAnimal.Demeanor = data[3];
-                newAnimal.KidFriendly = bool.Parse(data[4]);
-                newAnimal.PetFriendly = bool.Parse(data[5]);
+                newAnimal.KidFriendly = StringToBool(data[4]);
+                newAnimal.PetFriendly = StringToBool(data[5]);
                 newAnimal.Gender = data[6];
                 newAnimal.AdoptionStatus = data[7];
-                newAnimal.CategoryId = Int32.Parse(data[8]);
-                newAnimal.DietPlanId = Int32.Parse(data[9]);
-                newAnimal.EmployeeId = Int32.Parse(data[10]);
-                            
+                newAnimal.CategoryId = StringToInt(data[8]);
+                newAnimal.DietPlanId = StringToInt(data[9]);
+                newAnimal.EmployeeId = StringToInt(data[10]);
 
             db.Animals.InsertOnSubmit(newAnimal);
             db.SubmitChanges();
             }
 
-       }
+        }
+
+        internal static bool StringToBool(string value)
+        {
+            if (value == "1")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         
-    
+        internal static int? StringToInt(string value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+            try
+            {
+                return Int32.Parse(value);
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
     }
 }
-
-
-
-//var query = from line in csv
-//            let data = line.Split(',')
-//            select new
-//            {
-//                newAnimal.Name = data[0],
-//                Weight = data[1],
-//                Age = data[2],
-//                Demeanor = data[3],
-//                KidFriendly = data[4],
-//                PetFriendly = data[5],
-//                Gender = data[6],
-//                AdoptionStatus = data[7],
-//                CategoryId = data[8],
-//                DietPlan = data[9],
-//                EmployeeId = data[10]
-//            };
-
-
-
-
-
-//string[] csvlines = File.ReadAllLines(Filname);
-//var query = from csvline in csvlines
-//            let data = csvline.Split(',')
-//            select new
-//            {
-//                ID = data[0],
-//                FirstNumber = data[1],
-//                SecondNumber = data[2],
-//                ThirdNumber = data[3]
-//            };
