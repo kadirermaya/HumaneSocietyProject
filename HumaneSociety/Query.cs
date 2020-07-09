@@ -318,7 +318,19 @@
          * "6. Pet friendly", "7. Weight", "8. Finished*/
         internal static void RemoveAnimal(Animal animal)
         {
-            throw new NotImplementedException();
+            try
+            {
+                animal = db.Animals.Where(a => a.AnimalId == animal.AnimalId).Single();
+            }
+            catch (InvalidOperationException e)
+            {
+                Console.WriteLine("No animals have a AnimalId that matches the Animal passed in.");
+                Console.WriteLine("No update have been made.");
+                return;
+            }
+
+            db.Animals.DeleteOnSubmit(animal);
+            db.SubmitChanges();
         }
 
         // TODO: Animal Multi-Trait Search
