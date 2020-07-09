@@ -388,7 +388,15 @@ namespace HumaneSociety
                 Console.WriteLine("Category ID not found!");
                 throw;
             }
+            if (categoryID == null)
+            {
+                Console.WriteLine("Category ID does not exist. Please create one!");
+                throw new NullReferenceException();
+            }
+            else
+            {
             return categoryID.CategoryId;
+            }
         }
 
         internal static Room GetRoom(int animalID)
@@ -403,8 +411,15 @@ namespace HumaneSociety
                 Console.WriteLine("Room not found!");
                 return null;
             }
-            
-            return roomId;
+            if (roomId == null)
+            {
+                Console.WriteLine("Room ID does not exist. Please create one!");
+                throw new NullReferenceException();
+            }
+            else
+            {
+                return roomId;
+            }
         }
 
         internal static int GetDietPlanId(string dietPlanName)
@@ -419,8 +434,15 @@ namespace HumaneSociety
                 Console.WriteLine("Diet Plan not found!");
                 throw;
             }
-            
+            if (dietPlanId == null)
+            {
+                Console.WriteLine("Diet Plan does not exist. Please create one!");
+                throw new NullReferenceException();
+            }
+            else
+            {
             return dietPlanId.DietPlanId;
+            }
         }
 
         // TODO: Adoption CRUD Operations
@@ -489,6 +511,7 @@ namespace HumaneSociety
                 Console.WriteLine("Shot not found!");
                 return null;
             }
+
             return animalShot;
         }
 

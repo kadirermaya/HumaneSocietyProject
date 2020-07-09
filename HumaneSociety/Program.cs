@@ -10,8 +10,7 @@ namespace HumaneSociety
     {
         static void Main(string[] args)
         {
-            Query.AnimalsFromCSV();
-            //PointOfEntry.Run();
+            PointOfEntry.Run();
         }
     }
 }
