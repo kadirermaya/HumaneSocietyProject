@@ -1,8 +1,12 @@
-﻿namespace HumaneSociety
+﻿using System;
+
+namespace HumaneSociety
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.IO;
+    using System.Runtime.InteropServices.ComTypes;
 
     public static class Query
     {
@@ -452,5 +456,71 @@
             newAnimalShot.DateReceived = DateTime.Today;
 
         }
+
+        internal static void AnimalsFromCSV() //"C:/users/file.csv
+        {
+            string path = "D:\\Source\\repos\\HumaneSociety\\animals.csv";
+
+            Animal newAnimal = new Animal();
+            string[] csv = File.ReadAllLines(path);//"Fido,13,Male,Dog Food,Friendly,True"
+
+            foreach (string item in csv)
+            {
+                string[] data = item.Split(',');
+
+                newAnimal.Name = data[0];
+                newAnimal.Weight = Int32.Parse(data[1]);
+                newAnimal.Age = Int32.Parse(data[2]);
+                newAnimal.Demeanor = data[3];
+                newAnimal.KidFriendly = bool.Parse(data[4]);
+                newAnimal.PetFriendly = bool.Parse(data[5]);
+                newAnimal.Gender = data[6];
+                newAnimal.AdoptionStatus = data[7];
+                newAnimal.CategoryId = Int32.Parse(data[8]);
+                newAnimal.DietPlanId = Int32.Parse(data[9]);
+                newAnimal.EmployeeId = Int32.Parse(data[10]);
+                            
+
+            db.Animals.InsertOnSubmit(newAnimal);
+            db.SubmitChanges();
+            }
+
+       }
+        
+    
     }
 }
+
+
+
+//var query = from line in csv
+//            let data = line.Split(',')
+//            select new
+//            {
+//                newAnimal.Name = data[0],
+//                Weight = data[1],
+//                Age = data[2],
+//                Demeanor = data[3],
+//                KidFriendly = data[4],
+//                PetFriendly = data[5],
+//                Gender = data[6],
+//                AdoptionStatus = data[7],
+//                CategoryId = data[8],
+//                DietPlan = data[9],
+//                EmployeeId = data[10]
+//            };
+
+
+
+
+
+//string[] csvlines = File.ReadAllLines(Filname);
+//var query = from csvline in csvlines
+//            let data = csvline.Split(',')
+//            select new
+//            {
+//                ID = data[0],
+//                FirstNumber = data[1],
+//                SecondNumber = data[2],
+//                ThirdNumber = data[3]
+//            };
